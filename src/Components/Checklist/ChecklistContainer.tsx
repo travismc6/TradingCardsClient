@@ -15,7 +15,9 @@ import { CardParams } from "../../Models/CardParams";
 import ChecklistGrid from "./ChecklistGrid";
 import { FaFileExcel, FaFilter } from "react-icons/fa";
 import { CollectionChanges } from "../../Models/CollectionChanges";
-import { toast } from "react-toastify";
+import toastNotify from "../Common/toastHelper";
+import { BrandsEnum } from "../../Models/BrandsEnum";
+import qs from "qs";
 
 function ChecklistContainer() {
   const [cards, setCards] = useState<Array<ChecklistCard>>([]);
@@ -46,23 +48,34 @@ function ChecklistContainer() {
       }
     }
 
-    setCardParams((c) => ({
-      ...cardParams,
+    setCardParams((prevState) => ({
+      ...prevState,
       year: year,
     }));
   };
 
   const handleBrandChange = (event: ChangeEvent<HTMLInputElement>) => {
-    // const { name, checked } = event.target;
-    // if (checked) {
-    //   cardParams.brand?.push(name)
-    // } else {
-    // }
-    // // Update the state based on the checkbox's checked property
-    // setCardParams((c) => ({
-    //   ...cardParams,
-    //   year: year,
-    // }));
+    const brandId = parseInt(event.target.id);
+    const isChecked = event.target.checked;
+
+    if (isChecked) {
+      setCardParams((prevState) => ({
+        ...prevState,
+        brands: prevState.brands ? [...prevState.brands, brandId] : [brandId],
+      }));
+    } else if (cardParams.brands !== null && cardParams.brands !== undefined) {
+      setCardParams((prevState) => ({
+        ...prevState,
+        brands: prevState.brands!.filter((b) => b !== brandId),
+      }));
+    }
+  };
+
+  const handlePlayerNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setCardParams((prevState) => ({
+      ...prevState,
+      name: event.target.value,
+    }));
   };
 
   const cardAdded = (id: number) => {
@@ -77,25 +90,24 @@ function ChecklistContainer() {
     });
   };
   useEffect(() => {
+    loadCards();
+  }, []);
+
+  function loadCards(): void {
     axios
-      .get(ENDPOINTS.GET_CARDS)
+      .get(ENDPOINTS.GET_CARDS, {
+        params: cardParams,
+        paramsSerializer: (params) =>
+          qs.stringify(params, { arrayFormat: "repeat" }),
+      })
       .then((response) => {
         setCards(response.data);
       })
       .catch((err) => {
         setError(err);
-        toast.error("Error loading cards", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
+        toastNotify("Error loading cards.", "error");
       });
-  }, []);
+  }
 
   function handleSave(): void {
     const changes: CollectionChanges = {
@@ -107,35 +119,20 @@ function ChecklistContainer() {
       .post(ENDPOINTS.SAVE_COLLECTION, changes)
       .then((response) => {
         // set is no loading
-
         setCardsAdded([]);
         setCardsRemoved([]);
 
-        toast.success("Collection Updated!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toastNotify("Collection Updated!");
       })
       .catch((err) => {
+        toastNotify("Error saving collection", "error");
         // set banner
         setError(err);
-        toast.error("Error saving collection", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
       });
+  }
+
+  function filterClick(): void {
+    loadCards();
   }
 
   return (
@@ -144,7 +141,11 @@ function ChecklistContainer() {
         <Col xs={2} style={{ backgroundColor: "#f8f9fa" }}>
           <div style={{ padding: "20px" }}>
             <Form.Group style={{ maxWidth: "300px" }}>
-              <Form.Control type="text" placeholder="Player..." />
+              <Form.Control
+                type="text"
+                placeholder="Player..."
+                onChange={handlePlayerNameChange}
+              />
             </Form.Group>
 
             <h5 style={{ marginTop: "20px" }}>Brands</h5>
@@ -153,16 +154,19 @@ function ChecklistContainer() {
               <Form.Check
                 type="checkbox"
                 label="Topps"
+                id={BrandsEnum.Topps.toString()}
                 onChange={handleBrandChange}
               />
               <Form.Check
                 type="checkbox"
                 label="Bowman"
+                id={BrandsEnum.Bowman.toString()}
                 onChange={handleBrandChange}
               />
               <Form.Check
                 type="checkbox"
                 label="UpperDeck"
+                id={BrandsEnum.UpperDeck.toString()}
                 onChange={handleBrandChange}
               />
             </Form.Group>
@@ -196,7 +200,8 @@ function ChecklistContainer() {
             <div style={{ marginTop: "20px" }}>
               <Button
                 variant="primary"
-                style={{ marginRight: "10px", width: "200px" }}
+                style={{ marginRight: "10px" }}
+                onClick={filterClick}
               >
                 <FaFilter /> Filter
               </Button>
@@ -204,7 +209,7 @@ function ChecklistContainer() {
 
             <Button
               variant="success"
-              style={{ marginTop: "100px", width: "200px" }}
+              style={{ marginTop: "100px" }}
               onClick={() => {}}
             >
               <FaFileExcel /> Export to Excel
@@ -214,7 +219,7 @@ function ChecklistContainer() {
               <Button
                 onClick={handleSave}
                 variant="success"
-                style={{ marginRight: "10px", width: "200px" }}
+                style={{ marginRight: "10px" }}
               >
                 Save Collection
               </Button>

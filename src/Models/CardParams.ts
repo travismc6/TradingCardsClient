@@ -1,7 +1,5 @@
-import { BrandsEnum } from "./BrandsEnum";
-
 export interface CardParams {
   year?: number | null;
-  brand?: BrandsEnum[] | null;
+  brands?: number[] | null;
   name?: string | null;
 }

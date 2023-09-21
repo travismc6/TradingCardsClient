@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import Header from '../Components/Layout/Header';
-import Home from '../Components/Home';
-import Footer from '../Components/Layout/Footer';
-import { createRoot } from 'react-dom/client';
-import { AgGridReact } from 'ag-grid-react'; // the AG Grid React Component
+import React, { useEffect } from "react";
+import { Route, Routes } from "react-router-dom";
+import Header from "../Components/Layout/Header";
+import Home from "../Components/Home";
+import Footer from "../Components/Layout/Footer";
+import { createRoot } from "react-dom/client";
+import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
 
-import 'ag-grid-community/styles/ag-grid.css'; // Core grid CSS, always needed
-import 'ag-grid-community/styles/ag-theme-alpine.css'; // Optional theme CSS
+import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
+import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
+import CardDetails from "../Components/Details/CardDetails";
 
 function App() {
   //const dispatch = useDispatch();
@@ -42,6 +43,7 @@ function App() {
       <div className="pb-5">
         <Routes>
           <Route path="/" element={<Home />}></Route>
+          <Route path="/card/:cardId" element={<CardDetails />}></Route>
           {/* <Route
             path="/menuItemDetails/:menuItemId"
             element={<MenuItemDetails />}
