@@ -1,36 +1,29 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Align text vertically to center */
+.navbar.align-text {
+  display: flex;
+  align-items: center;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+/* Ensure buttons and links are centered */
+.navbar .nav {
+  align-items: center;
 }
 
-.custom-buttons {
-  border: 0;
-  background: transparent;
-  color: #212529 !important;
-  margin: 12px 24px;
-
-  /* border-radius: 20px; */
+/* Ensure buttons are aligned to the far right */
+.navbar .navbar-collapse {
+  justify-content: flex-end;
 }
 
-.custom-buttons.active {
-  border-bottom: 3px solid #198754;
-  color: #198754 !important;
+.custom-margin {
+  margin-left: 10px !important; /* Use !important to ensure the style is not overridden */
+  margin-right: 10px !important; /* Using !important to override other styles */
 }
 
-.image-box {
-  transition: 0.2s;
+.nav-link .button-margin {
+  margin-right: 10px !important; /* Using !important to override other styles */
+  margin-left: 10px !important; /* Using !important to override other styles */
 }
 
-.image-box:hover {
-  box-shadow: 0 0 5px #000;
-  transform: scale(1.05);
+.button-padding {
+  padding-right: 10px; /* Adjust as needed */
 }

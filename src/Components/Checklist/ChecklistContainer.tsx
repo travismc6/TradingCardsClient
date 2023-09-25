@@ -18,8 +18,11 @@ import { CollectionChanges } from "../../Models/CollectionChanges";
 import toastNotify from "../Common/toastHelper";
 import { BrandsEnum } from "../../Models/BrandsEnum";
 import qs from "qs";
+import useAuth from "../Hooks/useAuth";
 
 function ChecklistContainer() {
+  const { user } = useAuth();
+
   const [cards, setCards] = useState<Array<ChecklistCard>>([]);
   const [error, setError] = useState(null);
 
@@ -189,14 +192,6 @@ function ChecklistContainer() {
               ))}
             </DropdownButton>
 
-            <Form style={{ marginTop: "20px" }}>
-              <Form.Check // prettier-ignore
-                type="switch"
-                id="custom-switch"
-                label="Only cards in collection"
-              />
-            </Form>
-
             <div style={{ marginTop: "20px" }}>
               <Button
                 variant="primary"
@@ -207,23 +202,34 @@ function ChecklistContainer() {
               </Button>
             </div>
 
-            <Button
-              variant="success"
-              style={{ marginTop: "100px" }}
-              onClick={() => {}}
-            >
-              <FaFileExcel /> Export to Excel
-            </Button>
+            {user !== null && (
+              <div>
+                <Form style={{ marginTop: "20px" }}>
+                  <Form.Check // prettier-ignore
+                    type="switch"
+                    id="custom-switch"
+                    label="Only cards in collection"
+                  />
+                </Form>
+                <Button
+                  variant="success"
+                  style={{ marginTop: "100px" }}
+                  onClick={() => {}}
+                >
+                  <FaFileExcel /> Export to Excel
+                </Button>
 
-            <div style={{ marginTop: "20px" }}>
-              <Button
-                onClick={handleSave}
-                variant="success"
-                style={{ marginRight: "10px" }}
-              >
-                Save Collection
-              </Button>
-            </div>
+                <div style={{ marginTop: "20px" }}>
+                  <Button
+                    onClick={handleSave}
+                    variant="success"
+                    style={{ marginRight: "10px" }}
+                  >
+                    Save Collection
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </Col>
 

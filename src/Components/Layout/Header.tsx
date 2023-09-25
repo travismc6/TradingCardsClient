@@ -1,45 +1,61 @@
+import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
 import { faBaseball } from "@fortawesome/free-solid-svg-icons";
+import { Navbar, Nav, Button } from "react-bootstrap";
+import useAuth from "../Hooks/useAuth";
 
 function Header() {
-  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  //const { theme, toggleTheme } = useContext(AuthContext);
 
   return (
-    <div>
-      <nav className="navbar navbar-expand-lg bg-dark navbar-dark">
-        <div className="container-fluid">
-          <NavLink className="nav-link" aria-current="page" to="/">
-            <FontAwesomeIcon
-              icon={faBaseball}
-              size="2x"
-              style={{ color: "white", padding: 5 }}
-            />
-          </NavLink>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0 w-100">
-              <li className="nav-item">
-                <NavLink className="nav-link" aria-current="page" to="/">
-                  Home
-                </NavLink>
-              </li>
-            </ul>
-          </div>
+    <Navbar bg="dark" variant="dark" expand="lg">
+      <Navbar.Brand as={NavLink} to="/">
+        <div className="d-flex align-items-center p-2">
+          <FontAwesomeIcon icon={faBaseball} className="pr-2" />
+          {"  "}
+          <span className="ml-2 custom-margin">CardCollection</span>
         </div>
-      </nav>
-    </div>
+      </Navbar.Brand>
+      <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      <Navbar.Collapse id="basic-navbar-nav">
+        <Nav className="ml-auto">
+          {user === null ? (
+            <>
+              <Nav.Item>
+                <NavLink to="/login">
+                  <Button variant="outline-light" className="p-2 custom-margin">
+                    Login
+                  </Button>
+                </NavLink>
+              </Nav.Item>
+              <Nav.Item>
+                <NavLink to="/register">
+                  <Button variant="primary" className="p-2 custom-margin">
+                    Register
+                  </Button>
+                </NavLink>
+              </Nav.Item>
+            </>
+          ) : (
+            <div>
+              <Nav.Item>
+                <span className="text-white pr-2">Hello, {user.name}!</span>
+                <NavLink to="/">
+                  <Button
+                    variant="outline-light"
+                    className="p-2 custom-margin"
+                    onClick={logout}
+                  >
+                    Logout
+                  </Button>
+                </NavLink>
+              </Nav.Item>
+            </div>
+          )}
+        </Nav>
+      </Navbar.Collapse>
+    </Navbar>
   );
 }
 
