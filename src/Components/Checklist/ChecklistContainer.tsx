@@ -21,12 +21,14 @@ import qs from "qs";
 import useAuth from "../Hooks/useAuth";
 
 function ChecklistContainer() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   const [cards, setCards] = useState<Array<ChecklistCard>>([]);
   const [error, setError] = useState(null);
 
-  const [cardParams, setCardParams] = useState<CardParams>({});
+  const [cardParams, setCardParams] = useState<CardParams>({
+    inCollection: false,
+  });
 
   const [cardsAdded, setCardsAdded] = useState<number[]>([]);
   const [cardsRemoved, setCardsRemoved] = useState<number[]>([]);
@@ -81,6 +83,14 @@ function ChecklistContainer() {
     }));
   };
 
+  const handleOnlyCollectionChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const isChecked = event.target.checked;
+    setCardParams((prevState) => ({
+      ...prevState,
+      inCollection: isChecked,
+    }));
+  };
+
   const cardAdded = (id: number) => {
     setCardsAdded((prevIds) => {
       return [...prevIds, id];
@@ -93,8 +103,8 @@ function ChecklistContainer() {
     });
   };
   useEffect(() => {
-    loadCards();
-  }, []);
+    if (!loading) loadCards();
+  }, [user, loading]);
 
   function loadCards(): void {
     axios
@@ -102,6 +112,9 @@ function ChecklistContainer() {
         params: cardParams,
         paramsSerializer: (params) =>
           qs.stringify(params, { arrayFormat: "repeat" }),
+        headers: {
+          Authorization: `Bearer ${user?.authToken}`,
+        },
       })
       .then((response) => {
         setCards(response.data);
@@ -119,7 +132,11 @@ function ChecklistContainer() {
     };
 
     axios
-      .post(ENDPOINTS.SAVE_COLLECTION, changes)
+      .post(ENDPOINTS.SAVE_COLLECTION, changes, {
+        headers: {
+          Authorization: `Bearer ${user?.authToken}`,
+        },
+      })
       .then((response) => {
         // set is no loading
         setCardsAdded([]);
@@ -209,6 +226,7 @@ function ChecklistContainer() {
                     type="switch"
                     id="custom-switch"
                     label="Only cards in collection"
+                    onChange={handleOnlyCollectionChange}
                   />
                 </Form>
                 <Button

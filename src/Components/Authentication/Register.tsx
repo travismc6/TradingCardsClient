@@ -40,7 +40,8 @@ export default function Register() {
         .post(ENDPOINTS.REGISTER, formData)
         .then((response) => {
           if (response.status === 200) {
-            navigate("/");
+            navigate("/login");
+            toastNotify("User created. Please Login to continue...");
           }
         })
         .catch((err) => {
@@ -95,7 +96,7 @@ export default function Register() {
           <Form.Control
             type="email"
             placeholder="Enter Email"
-            name="name"
+            name="email"
             value={formData.email}
             onChange={handleChange}
             required

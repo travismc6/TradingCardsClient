@@ -9,6 +9,7 @@ import { AgGridReact } from "ag-grid-react";
 import { ChecklistCard } from "../../Models/ChecklistCard";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../Hooks/useAuth";
 
 interface LinkProps extends ICellRendererParams {
   value: string;
@@ -27,17 +28,26 @@ export default function ChecklistGrid({
   cardRemoved,
 }: Props) {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const LinkComponent = (props: LinkProps) => {
-    return (
+    const card = props.data as ChecklistCard;
+
+    // TODO: pass props
+    //const cardDetailProps: CardDetailsProps = { cardData: card };
+
+    return card.inCollection ? (
       <Button
         variant="link"
         onClick={() => {
-          navigate("/cardDetails");
+          navigate(`/card/${card.id}`);
         }}
+        style={{ padding: 0 }}
       >
-        {props.value}
+        <span>{props.value}</span>
       </Button>
+    ) : (
+      card.name
     );
   };
 
@@ -48,6 +58,7 @@ export default function ChecklistGrid({
       width: 70,
       cellDataType: "boolean",
       editable: true,
+      hide: user === null,
     },
     {
       headerName: "#",

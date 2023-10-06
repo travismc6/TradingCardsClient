@@ -3,8 +3,6 @@ export interface ChecklistCard {
   number: string;
   name: string;
   notes: string;
-  image: string;
-  setName: string;
   brand: number;
   year: number;
   setId: number;

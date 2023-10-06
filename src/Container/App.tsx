@@ -1,10 +1,7 @@
-import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import Header from "../Components/Layout/Header";
 import Home from "../Components/Home";
 import Footer from "../Components/Layout/Footer";
-import { createRoot } from "react-dom/client";
-import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
 
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
 import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
@@ -23,7 +20,7 @@ function App() {
             <Route path="/" element={<Home />}></Route>
             <Route path="/login" element={<Login />}></Route>
             <Route path="/register" element={<Register />}></Route>
-            <Route path="/card/:cardId" element={<CardDetails />}></Route>
+            <Route path="/card/:id" element={<CardDetails />}></Route>
           </Routes>
         </div>
         <Footer />
