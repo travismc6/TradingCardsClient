@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import axios from "axios";
 import { ChecklistCard } from "../../Models/ChecklistCard";
 import { ENDPOINTS } from "../../Utils/apiConfig";
@@ -19,12 +19,15 @@ import toastNotify from "../Common/toastHelper";
 import { BrandsEnum } from "../../Models/BrandsEnum";
 import qs from "qs";
 import useAuth from "../Hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import ConfirmationModal from "../Common/ConfirmationModal";
+import InfoModal from "../Common/InfoModal";
 
 function ChecklistContainer() {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
 
   const [cards, setCards] = useState<Array<ChecklistCard>>([]);
-  const [error, setError] = useState(null);
 
   const [cardParams, setCardParams] = useState<CardParams>({
     inCollection: false,
@@ -32,6 +35,8 @@ function ChecklistContainer() {
 
   const [cardsAdded, setCardsAdded] = useState<number[]>([]);
   const [cardsRemoved, setCardsRemoved] = useState<number[]>([]);
+
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const years = generateYears(1951, 1970);
 
@@ -57,6 +62,14 @@ function ChecklistContainer() {
       ...prevState,
       year: year,
     }));
+  };
+
+  const cardClicked = (id: number) => {
+    if (cardsAdded.length === 0 && cardsRemoved.length === 0) {
+      navigate(`/card/${id}`);
+    } else {
+      setShowModal(true);
+    }
   };
 
   const handleBrandChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -92,15 +105,31 @@ function ChecklistContainer() {
   };
 
   const cardAdded = (id: number) => {
-    setCardsAdded((prevIds) => {
-      return [...prevIds, id];
-    });
+    const isRemoved = cardsRemoved.find((n) => n === id);
+
+    const removed = cardsRemoved.filter(
+      (number) => !number.toString().includes(id.toString())
+    );
+    setCardsRemoved(removed);
+
+    if (!isRemoved) {
+      setCardsAdded((prevIds) => {
+        return [...prevIds, id];
+      });
+    }
   };
 
   const cardRemoved = (id: number) => {
-    setCardsRemoved((prevIds) => {
-      return [...prevIds, id];
-    });
+    const isAdded = cardsAdded.find((n) => n === id);
+
+    const added = cardsAdded.filter((number) => number !== id);
+    setCardsAdded(added);
+
+    if (!isAdded) {
+      setCardsRemoved((prevIds) => {
+        return [...prevIds, id];
+      });
+    }
   };
   useEffect(() => {
     if (!loading) loadCards();
@@ -108,7 +137,7 @@ function ChecklistContainer() {
 
   function loadCards(): void {
     axios
-      .get(ENDPOINTS.GET_CARDS, {
+      .get(ENDPOINTS.GET_CHECKLIST, {
         params: cardParams,
         paramsSerializer: (params) =>
           qs.stringify(params, { arrayFormat: "repeat" }),
@@ -120,7 +149,6 @@ function ChecklistContainer() {
         setCards(response.data);
       })
       .catch((err) => {
-        setError(err);
         toastNotify("Error loading cards.", "error");
       });
   }
@@ -132,7 +160,7 @@ function ChecklistContainer() {
     };
 
     axios
-      .post(ENDPOINTS.SAVE_COLLECTION, changes, {
+      .post(ENDPOINTS.SAVE_CHECKLIST, changes, {
         headers: {
           Authorization: `Bearer ${user?.authToken}`,
         },
@@ -147,12 +175,15 @@ function ChecklistContainer() {
       .catch((err) => {
         toastNotify("Error saving collection", "error");
         // set banner
-        setError(err);
       });
   }
 
   function filterClick(): void {
-    loadCards();
+    if (cardsAdded.length === 0 && cardsRemoved.length === 0) {
+      loadCards();
+    } else {
+      setShowModal(true);
+    }
   }
 
   return (
@@ -241,6 +272,9 @@ function ChecklistContainer() {
                   <Button
                     onClick={handleSave}
                     variant="success"
+                    disabled={
+                      cardsAdded.length === 0 && cardsRemoved.length === 0
+                    }
                     style={{ marginRight: "10px" }}
                   >
                     Save Collection
@@ -256,9 +290,16 @@ function ChecklistContainer() {
             cards={cards}
             cardAdded={cardAdded}
             cardRemoved={cardRemoved}
+            cardClicked={cardClicked}
           />
         </Col>
       </Row>
+      <InfoModal
+        show={showModal}
+        title="Unsaved Collection"
+        onConfirm={() => setShowModal(false)}
+        message="There are unsaved changes to the collection. Please save collection first."
+      />
     </Container>
   );
 }

@@ -20,27 +20,25 @@ interface Props {
   cards: ChecklistCard[];
   cardAdded: (id: number) => void;
   cardRemoved: (id: number) => void;
+  cardClicked: (id: number) => void;
 }
 
 export default function ChecklistGrid({
   cards,
   cardAdded,
   cardRemoved,
+  cardClicked,
 }: Props) {
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const LinkComponent = (props: LinkProps) => {
     const card = props.data as ChecklistCard;
 
-    // TODO: pass props
-    //const cardDetailProps: CardDetailsProps = { cardData: card };
-
     return card.inCollection ? (
       <Button
         variant="link"
         onClick={() => {
-          navigate(`/card/${card.id}`);
+          cardClicked(card.id);
         }}
         style={{ padding: 0 }}
       >

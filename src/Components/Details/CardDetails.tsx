@@ -123,12 +123,22 @@ export default function CardDetails() {
         )
         .then((response) => {
           toastNotify("Image Uploaded...");
+
+          if (imageType === ImageTypeEnum.Front) {
+            setCard((prevState) => ({
+              ...prevState,
+              frontImageUrl: response.data,
+            }));
+          } else {
+            setCard((prevState) => ({
+              ...prevState,
+              backImageUrl: response.data,
+            }));
+          }
         })
         .catch((err) => {
           toastNotify("Error uploading image", "error");
         });
-
-      // post to api
     }
   };
 
@@ -206,7 +216,19 @@ export default function CardDetails() {
                   }
                 />
               </a>
-              <a href="#">Upload Back Image</a>
+              <input
+                accept="image/*"
+                ref={inputRef}
+                onChange={handleDisplayFileDetails}
+                className="d-none"
+                type="file"
+              />
+              <Button
+                variant="link"
+                onClick={() => handleImageUploadClick(ImageTypeEnum.Back)}
+              >
+                Upload Back Image
+              </Button>{" "}
             </div>
           </div>
 
