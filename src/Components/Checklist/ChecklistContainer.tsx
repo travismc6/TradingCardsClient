@@ -178,6 +178,46 @@ function ChecklistContainer() {
       });
   }
 
+  function handleExportCollection(): void {
+    axios
+      .get(ENDPOINTS.EXPORT_CHECKLIST, {
+        params: cardParams,
+        responseType: "blob",
+        paramsSerializer: (params) =>
+          qs.stringify(params, { arrayFormat: "repeat" }),
+        headers: {
+          Authorization: `Bearer ${user?.authToken}`,
+        },
+      })
+      .then((response) => {
+        // Create a Blob from the received data
+        const blob = new Blob([response.data], {
+          type: response.headers["content-type"],
+        });
+
+        // Create an object URL for the blob
+        const blobURL = window.URL.createObjectURL(blob);
+
+        // Create a new anchor element in the DOM
+        const tempLink = document.createElement("a");
+        tempLink.href = blobURL;
+        tempLink.setAttribute("download", "file.xlsx");
+        tempLink.style.display = "none";
+        document.body.appendChild(tempLink);
+
+        // Programmatically click the anchor to trigger download
+        tempLink.click();
+
+        // Clean up: remove the anchor from the DOM and revoke the blob URL
+        document.body.removeChild(tempLink);
+        window.URL.revokeObjectURL(blobURL);
+        toastNotify("Collection exported");
+      })
+      .catch((err) => {
+        toastNotify("Error exporting cards.", "error");
+      });
+  }
+
   function filterClick(): void {
     if (cardsAdded.length === 0 && cardsRemoved.length === 0) {
       loadCards();
@@ -263,7 +303,7 @@ function ChecklistContainer() {
                 <Button
                   variant="success"
                   style={{ marginTop: "100px" }}
-                  onClick={() => {}}
+                  onClick={handleExportCollection}
                 >
                   <FaFileExcel /> Export to Excel
                 </Button>

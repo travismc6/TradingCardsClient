@@ -4,6 +4,7 @@ const API_BASE_URL = "https://localhost:44395/api";
 export const ENDPOINTS = {
   GET_CHECKLIST: `${API_BASE_URL}/cardchecklist`,
   SAVE_CHECKLIST: `${API_BASE_URL}/cardchecklist`,
+  EXPORT_CHECKLIST: `${API_BASE_URL}/cardchecklist/export`,
   REGISTER: `${API_BASE_URL}/auth/register`,
   LOGIN: `${API_BASE_URL}/auth/login`,
   SAVE_CARD: `${API_BASE_URL}/cardcollection`,
