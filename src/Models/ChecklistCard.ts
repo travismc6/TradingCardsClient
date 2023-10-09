@@ -7,4 +7,5 @@ export interface ChecklistCard {
   year: number;
   setId: number;
   inCollection: boolean;
+  collectionCardId: number | null;
 }

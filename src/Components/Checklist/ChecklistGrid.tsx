@@ -7,9 +7,10 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
 import { ChecklistCard } from "../../Models/ChecklistCard";
-import { Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { Button, Form } from "react-bootstrap";
 import useAuth from "../Hooks/useAuth";
+import { FaPlus, FaTrash } from "react-icons/fa";
+import { useState } from "react";
 
 interface LinkProps extends ICellRendererParams {
   value: string;
@@ -18,9 +19,11 @@ interface LinkProps extends ICellRendererParams {
 
 interface Props {
   cards: ChecklistCard[];
-  cardAdded: (id: number) => void;
-  cardRemoved: (id: number) => void;
+  cardAdded: (cardId: number) => void;
+  cardRemoved: (collectionCardId: number) => void;
   cardClicked: (id: number) => void;
+  duplicateAdded: (card: ChecklistCard) => void;
+  collectionCardDeleted: (card: ChecklistCard) => void;
 }
 
 export default function ChecklistGrid({
@@ -28,8 +31,11 @@ export default function ChecklistGrid({
   cardAdded,
   cardRemoved,
   cardClicked,
+  duplicateAdded,
+  collectionCardDeleted,
 }: Props) {
   const { user } = useAuth();
+  const [cardsAdded, setCardsAdded] = useState<number[]>([]);
 
   const LinkComponent = (props: LinkProps) => {
     const card = props.data as ChecklistCard;
@@ -38,7 +44,7 @@ export default function ChecklistGrid({
       <Button
         variant="link"
         onClick={() => {
-          cardClicked(card.id);
+          cardClicked(card.collectionCardId!);
         }}
         style={{ padding: 0 }}
       >
@@ -49,14 +55,104 @@ export default function ChecklistGrid({
     );
   };
 
+  const ActionsComponent = (props: LinkProps) => {
+    const card = props.data as ChecklistCard;
+
+    if (card.inCollection) {
+      return (
+        <>
+          <Button
+            variant="link"
+            onClick={() => handleDeleteClick(card)}
+            style={{ margin: "0" }}
+            title="Delete"
+          >
+            <FaTrash color="gray" />
+          </Button>
+
+          <Button
+            variant="link"
+            title="Add a duplicate"
+            onClick={() => handleAddDuplicateClick(card)}
+            style={{ margin: "0" }}
+          >
+            <FaPlus color="gray" />
+          </Button>
+        </>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
+  const CheckComponent = (props: LinkProps) => {
+    const card = props.data as ChecklistCard;
+
+    if (card.inCollection) {
+      return (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={card.inCollection}
+            disabled={true}
+            style={{ margin: "0 5px" }}
+          />
+        </div>
+      );
+    } else {
+      return (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <input
+            type="checkbox"
+            style={{ margin: "0 5px" }}
+            checked={cardsAdded.includes(card.id)}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              const isChecked = event.target.checked;
+
+              if (isChecked) {
+                setCardsAdded((prevIds) => {
+                  return [...prevIds, card.id];
+                });
+                cardAdded(card.id);
+              } else {
+                const added = cardsAdded.filter((number) => number !== card.id);
+                setCardsAdded(added);
+                cardRemoved(card.id);
+              }
+            }}
+          />
+        </div>
+      );
+    }
+  };
+
+  const handleAddDuplicateClick = (card: ChecklistCard) => {
+    duplicateAdded(card);
+  };
+
+  const handleDeleteClick = (card: ChecklistCard) => {
+    collectionCardDeleted(card);
+  };
+
   const columnDefs: ColDef[] = [
     {
       headerName: "",
       field: "inCollection",
-      width: 70,
-      cellDataType: "boolean",
-      editable: true,
+      width: 50,
       hide: user === null,
+      cellRenderer: CheckComponent,
     },
     {
       headerName: "#",
@@ -72,27 +168,20 @@ export default function ChecklistGrid({
       sortable: true,
       cellRenderer: LinkComponent,
     },
-    { headerName: "Notes", field: "notes", sortable: true },
+    // { headerName: "Notes", field: "notes", sortable: true },
+    {
+      headerName: "",
+      sortable: false,
+      cellRenderer: ActionsComponent,
+    },
   ];
-
-  const onCellValueChanged = (params: CellValueChangedEvent) => {
-    const card = params.data as ChecklistCard;
-
-    if (params.column.getColId() === "inCollection") {
-      if (card.inCollection) {
-        cardAdded(card.id);
-      } else {
-        cardRemoved(card.id);
-      }
-    }
-  };
 
   return (
     <div className="ag-theme-alpine" style={{ height: "100vh", padding: 20 }}>
       <AgGridReact
         rowData={cards}
         columnDefs={columnDefs}
-        onCellValueChanged={onCellValueChanged}
+        //onCellValueChanged={onCellValueChanged}
       />
     </div>
   );

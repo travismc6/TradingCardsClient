@@ -8,6 +8,9 @@ export const ENDPOINTS = {
   REGISTER: `${API_BASE_URL}/auth/register`,
   LOGIN: `${API_BASE_URL}/auth/login`,
   SAVE_CARD: `${API_BASE_URL}/cardcollection`,
+  DELETE_CARD: (id: string) => `${API_BASE_URL}/cardcollection/delete/${id}`,
+  DUPLICATE_CARD: (id: string) =>
+    `${API_BASE_URL}/cardcollection/duplicate/${id}`,
   IMAGE_UPLOAD: (id: string) => `${API_BASE_URL}/cardcollection/image/${id}`,
   CARD_DETAILS: (id: string) => `${API_BASE_URL}/cardcollection/${id}`,
 };
