@@ -10,6 +10,7 @@ import Register from "../Components/Authentication/Register";
 import Login from "../Components/Authentication/Login";
 import { AuthProvider } from "../Components/Hooks/AuthContext";
 import ServerError from "../Components/Common/ServerError";
+import CardCollectionDetails from "../Components/CollectionDetails/CollectionDetails";
 
 function App() {
   return (
@@ -22,6 +23,10 @@ function App() {
             <Route path="/login" element={<Login />}></Route>
             <Route path="/register" element={<Register />}></Route>
             <Route path="/card/:id" element={<CardDetails />}></Route>
+            <Route
+              path="/collection"
+              element={<CardCollectionDetails />}
+            ></Route>
             <Route path="/server-error" element={<ServerError />}></Route>
           </Routes>
         </div>

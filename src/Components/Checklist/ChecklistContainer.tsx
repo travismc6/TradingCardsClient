@@ -10,11 +10,10 @@ import {
   DropdownButton,
   Form,
   Row,
-  Spinner,
 } from "react-bootstrap";
 import { CardParams } from "../../Models/CardParams";
 import ChecklistGrid from "./ChecklistGrid";
-import { FaFileExcel, FaFilter } from "react-icons/fa";
+import { FaFilter } from "react-icons/fa";
 import { CollectionChanges } from "../../Models/CollectionChanges";
 import toastNotify from "../Common/toastHelper";
 import { BrandsEnum } from "../../Models/BrandsEnum";
@@ -40,11 +39,35 @@ function ChecklistContainer() {
   });
 
   const [cardsAdded, setCardsAdded] = useState<number[]>([]);
-  // const [cardsRemoved, setCardsRemoved] = useState<number[]>([]);
 
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const years = generateYears(1951, 1970);
+
+  useEffect(() => {
+    if (userLoaded) loadCards();
+  }, [user, userLoaded]);
+
+  function loadCards(): void {
+    setLoading(true);
+
+    axios
+      .get(ENDPOINTS.GET_CHECKLIST, {
+        params: cardParams,
+        paramsSerializer: (params) =>
+          qs.stringify(params, { arrayFormat: "repeat" }),
+        headers: {
+          Authorization: `Bearer ${user?.authToken}`,
+        },
+      })
+      .then((response) => {
+        setCards(response.data);
+      })
+      .catch((err) => {
+        toastNotify("Error loading cards.", "error");
+      })
+      .finally(() => setLoading(false));
+  }
 
   function generateYears(start: number, end: number) {
     let years = [];
@@ -185,38 +208,6 @@ function ChecklistContainer() {
       .finally(() => setSaving(false));
   };
 
-  useEffect(() => {
-    if (userLoaded && user) loadCards();
-  }, [user, userLoaded]);
-
-  function loadCards(): void {
-    // var response = agent.Checklist.get()
-    //   .then((cards) => {
-    //     setCards(cards);
-    //   })
-    //   .catch((error) => console.log(error))
-    //   .finally();
-
-    setLoading(true);
-
-    axios
-      .get(ENDPOINTS.GET_CHECKLIST, {
-        params: cardParams,
-        paramsSerializer: (params) =>
-          qs.stringify(params, { arrayFormat: "repeat" }),
-        headers: {
-          Authorization: `Bearer ${user?.authToken}`,
-        },
-      })
-      .then((response) => {
-        setCards(response.data);
-      })
-      .catch((err) => {
-        toastNotify("Error loading cards.", "error");
-      })
-      .finally(() => setLoading(false));
-  }
-
   function handleSave(): void {
     const changes: CollectionChanges = {
       added: cardsAdded,
@@ -246,48 +237,6 @@ function ChecklistContainer() {
       .finally(() => setSaving(false));
   }
 
-  function handleExportCollection(): void {
-    setSaving(true);
-    axios
-      .get(ENDPOINTS.EXPORT_CHECKLIST, {
-        params: cardParams,
-        responseType: "blob",
-        paramsSerializer: (params) =>
-          qs.stringify(params, { arrayFormat: "repeat" }),
-        headers: {
-          Authorization: `Bearer ${user?.authToken}`,
-        },
-      })
-      .then((response) => {
-        // Create a Blob from the received data
-        const blob = new Blob([response.data], {
-          type: response.headers["content-type"],
-        });
-
-        // Create an object URL for the blob
-        const blobURL = window.URL.createObjectURL(blob);
-
-        // Create a new anchor element in the DOM
-        const tempLink = document.createElement("a");
-        tempLink.href = blobURL;
-        tempLink.setAttribute("download", "file.xlsx");
-        tempLink.style.display = "none";
-        document.body.appendChild(tempLink);
-
-        // Programmatically click the anchor to trigger download
-        tempLink.click();
-
-        // Clean up: remove the anchor from the DOM and revoke the blob URL
-        document.body.removeChild(tempLink);
-        window.URL.revokeObjectURL(blobURL);
-        toastNotify("Collection exported");
-      })
-      .catch((err) => {
-        toastNotify("Error exporting cards.", "error");
-      })
-      .finally(() => setSaving(false));
-  }
-
   function filterClick(): void {
     if (cardsAdded.length === 0) {
       loadCards();
@@ -296,129 +245,119 @@ function ChecklistContainer() {
     }
   }
 
-  if (!loading && userLoaded) {
-    return (
-      <>
-        {saving && <Saving />}
-        <Container fluid>
-          <Row>
-            <Col xs={2} style={{ backgroundColor: "#f8f9fa" }}>
-              <div style={{ padding: "20px" }}>
-                <Form.Group style={{ maxWidth: "300px" }}>
-                  <Form.Control
-                    type="text"
-                    placeholder="Player..."
-                    onChange={handlePlayerNameChange}
-                  />
-                </Form.Group>
+  return (
+    <>
+      {saving && <Saving />}
+      {loading && <Loading />}
+      <Container fluid>
+        <Row>
+          <Col xs={2} style={{ backgroundColor: "#f8f9fa" }}>
+            <div style={{ padding: "20px" }}>
+              <Form.Group style={{ maxWidth: "300px" }}>
+                <Form.Control
+                  type="text"
+                  placeholder="Player..."
+                  onChange={handlePlayerNameChange}
+                />
+              </Form.Group>
 
-                <h5 style={{ marginTop: "20px" }}>Brands</h5>
+              <h5 style={{ marginTop: "20px" }}>Brands</h5>
 
-                <Form.Group>
-                  <Form.Check
-                    type="checkbox"
-                    label="Topps"
-                    id={BrandsEnum.Topps.toString()}
-                    onChange={handleBrandChange}
-                  />
-                  <Form.Check
-                    type="checkbox"
-                    label="Bowman"
-                    id={BrandsEnum.Bowman.toString()}
-                    onChange={handleBrandChange}
-                  />
-                  <Form.Check
-                    type="checkbox"
-                    label="UpperDeck"
-                    id={BrandsEnum.UpperDeck.toString()}
-                    onChange={handleBrandChange}
-                  />
-                </Form.Group>
+              <Form.Group>
+                <Form.Check
+                  type="checkbox"
+                  label="Topps"
+                  id={BrandsEnum.Topps.toString()}
+                  onChange={handleBrandChange}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Bowman"
+                  id={BrandsEnum.Bowman.toString()}
+                  onChange={handleBrandChange}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="UpperDeck"
+                  id={BrandsEnum.UpperDeck.toString()}
+                  onChange={handleBrandChange}
+                />
+              </Form.Group>
 
-                <DropdownButton
-                  id="dropdown-basic-button"
-                  title={
-                    cardParams.year !== null && cardParams.year !== undefined
-                      ? cardParams.year
-                      : "Select Year"
-                  }
-                  variant="secondary"
-                  onSelect={yearChanged}
-                  style={{ marginTop: "20px", width: "100px" }}
+              <DropdownButton
+                id="dropdown-basic-button"
+                title={
+                  cardParams.year !== null && cardParams.year !== undefined
+                    ? cardParams.year
+                    : "Select Year"
+                }
+                variant="secondary"
+                onSelect={yearChanged}
+                style={{ marginTop: "20px", width: "100px" }}
+              >
+                {years.map((year) => (
+                  <Dropdown.Item eventKey={year} key={year}>
+                    {year}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+
+              <div style={{ marginTop: "20px" }}>
+                <Button
+                  variant="primary"
+                  style={{ marginRight: "10px" }}
+                  onClick={filterClick}
                 >
-                  {years.map((year) => (
-                    <Dropdown.Item eventKey={year} key={year}>
-                      {year}
-                    </Dropdown.Item>
-                  ))}
-                </DropdownButton>
-
-                <div style={{ marginTop: "20px" }}>
-                  <Button
-                    variant="primary"
-                    style={{ marginRight: "10px" }}
-                    onClick={filterClick}
-                  >
-                    <FaFilter /> Filter
-                  </Button>
-                </div>
-
-                {user !== null && (
-                  <div>
-                    <Form style={{ marginTop: "20px" }}>
-                      <Form.Check // prettier-ignore
-                        type="switch"
-                        id="custom-switch"
-                        label="Only cards in collection"
-                        onChange={handleOnlyCollectionChange}
-                      />
-                    </Form>
-                    <Button
-                      variant="success"
-                      style={{ marginTop: "100px" }}
-                      onClick={handleExportCollection}
-                    >
-                      <FaFileExcel /> Export to Excel
-                    </Button>
-
-                    <div style={{ marginTop: "20px" }}>
-                      <Button
-                        onClick={handleSave}
-                        variant="success"
-                        disabled={cardsAdded.length === 0}
-                        style={{ marginRight: "10px" }}
-                      >
-                        Save Collection
-                      </Button>
-                    </div>
-                  </div>
-                )}
+                  <FaFilter /> Filter
+                </Button>
               </div>
-            </Col>
 
-            <Col xs={8}>
-              <ChecklistGrid
-                cards={cards}
-                cardAdded={cardAdded}
-                cardRemoved={cardRemoved}
-                cardClicked={cardClicked}
-                duplicateAdded={duplicateAdded}
-                collectionCardDeleted={collectionCardDeleted}
-              />
-            </Col>
-          </Row>
-          <InfoModal
-            show={showModal}
-            title="Unsaved Collection"
-            onConfirm={() => setShowModal(false)}
-            message="There are unsaved changes to the collection. Please save collection first."
-          />
-        </Container>
-      </>
-    );
-  } else {
-    return <Loading />;
-  }
+              {user !== null && (
+                <div>
+                  <Form style={{ marginTop: "20px" }}>
+                    <Form.Check // prettier-ignore
+                      type="switch"
+                      id="custom-switch"
+                      label="Only cards in collection"
+                      onChange={handleOnlyCollectionChange}
+                    />
+                  </Form>
+
+                  <div style={{ marginTop: "40px" }}>
+                    <Button
+                      onClick={handleSave}
+                      variant="success"
+                      disabled={cardsAdded.length === 0}
+                      style={{ marginRight: "10px" }}
+                    >
+                      Save Collection
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Col>
+
+          <Col xs={8}>
+            <ChecklistGrid
+              cards={cards}
+              cardAdded={cardAdded}
+              cardRemoved={cardRemoved}
+              cardClicked={cardClicked}
+              duplicateAdded={duplicateAdded}
+              collectionCardDeleted={collectionCardDeleted}
+            />
+          </Col>
+        </Row>
+        <InfoModal
+          show={showModal}
+          title="Unsaved Collection"
+          onConfirm={() => setShowModal(false)}
+          message="There are unsaved changes to the collection. Please save collection first."
+        />
+      </Container>
+    </>
+  );
 }
 
 export default ChecklistContainer;

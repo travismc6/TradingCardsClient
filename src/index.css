@@ -10,8 +10,13 @@
 }
 
 /* Ensure buttons are aligned to the far right */
-.navbar .navbar-collapse {
+/* .navbar .navbar-collapse {
   justify-content: flex-end;
+} */
+
+.nav-buttons {
+  justify-content: flex-end;
+  margin-left: auto;
 }
 
 .custom-margin {

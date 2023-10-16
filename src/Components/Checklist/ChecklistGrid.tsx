@@ -37,7 +37,7 @@ export default function ChecklistGrid({
   const { user } = useAuth();
   const [cardsAdded, setCardsAdded] = useState<number[]>([]);
 
-  const LinkComponent = (props: LinkProps) => {
+  const PlayerNameComponent = (props: LinkProps) => {
     const card = props.data as ChecklistCard;
 
     return card.inCollection ? (
@@ -166,7 +166,7 @@ export default function ChecklistGrid({
       headerName: "Player Name",
       field: "name",
       sortable: true,
-      cellRenderer: LinkComponent,
+      cellRenderer: PlayerNameComponent,
     },
     // { headerName: "Notes", field: "notes", sortable: true },
     {

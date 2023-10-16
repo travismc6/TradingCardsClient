@@ -19,7 +19,30 @@ function Header() {
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
-        <Nav className="ml-auto">
+        <Nav>
+          {/* Additional NavLinks can be added here and they will be aligned to the left, to the right of the brand */}
+          <Nav.Item>
+            <NavLink to="/" className="nav-link">
+              Checklist
+            </NavLink>
+          </Nav.Item>
+
+          {user && (
+            <Nav.Item>
+              <NavLink to="/collection" className="nav-link">
+                Collection
+              </NavLink>
+            </Nav.Item>
+          )}
+          {user && (
+            <Nav.Item>
+              <NavLink to="/another-path" className="nav-link">
+                Admin
+              </NavLink>
+            </Nav.Item>
+          )}
+        </Nav>
+        <Nav className="nav-buttons ml-auto">
           {user === null ? (
             <>
               <Nav.Item>
