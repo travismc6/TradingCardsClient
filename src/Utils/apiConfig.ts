@@ -1,21 +1,19 @@
 import axios from "axios";
 
-//const API_BASE_URL = process.env.REACT_APP_API_URL;
-const API_BASE_URL = "https://localhost:44395/api";
+axios.defaults.baseURL = "https://localhost:44395/api/";
 
 export const ENDPOINTS = {
-  GET_CHECKLIST: `${API_BASE_URL}/cardchecklist`,
-  SAVE_CHECKLIST: `${API_BASE_URL}/cardchecklist`,
-  EXPORT_CHECKLIST: `${API_BASE_URL}/cardchecklist/export`,
-  REGISTER: `${API_BASE_URL}/auth/register`,
-  LOGIN: `${API_BASE_URL}/auth/login`,
-  SAVE_CARD: `${API_BASE_URL}/cardcollection`,
-  COLLECTION_DETAILS: `${API_BASE_URL}/cardcollection/details`,
-  DELETE_CARD: (id: string) => `${API_BASE_URL}/cardcollection/delete/${id}`,
-  DUPLICATE_CARD: (id: string) =>
-    `${API_BASE_URL}/cardcollection/duplicate/${id}`,
-  IMAGE_UPLOAD: (id: string) => `${API_BASE_URL}/cardcollection/image/${id}`,
-  CARD_DETAILS: (id: string) => `${API_BASE_URL}/cardcollection/${id}`,
+  GET_CHECKLIST: `cardchecklist`,
+  SAVE_CHECKLIST: `cardchecklist`,
+  EXPORT_CHECKLIST: `cardchecklist/export`,
+  REGISTER: `auth/register`,
+  LOGIN: `auth/login`,
+  SAVE_CARD: `cardcollection`,
+  COLLECTION_DETAILS: `cardcollection/details`,
+  DELETE_CARD: (id: string) => `cardcollection/delete/${id}`,
+  DUPLICATE_CARD: (id: string) => `cardcollection/duplicate/${id}`,
+  IMAGE_UPLOAD: (id: string) => `cardcollection/image/${id}`,
+  CARD_DETAILS: (id: string) => `cardcollection/${id}`,
 };
 
 const sleep = () => new Promise((resolve) => setTimeout(resolve, 500));
