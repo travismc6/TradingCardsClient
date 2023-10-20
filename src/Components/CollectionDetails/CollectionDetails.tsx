@@ -11,7 +11,7 @@ import {
   CollectionSetDetails,
 } from "../../Models/CollectionDetails";
 import { AgGridReact } from "ag-grid-react";
-import { ColDef, ICellRendererParams } from "ag-grid-community";
+import { ColDef } from "ag-grid-community";
 import { FaFileExcel } from "react-icons/fa";
 import toastNotify from "../Common/toastHelper";
 import qs from "qs";
@@ -37,8 +37,8 @@ export default function CardCollectionDetails() {
     }
   }, [userLoaded, user?.authToken]);
 
-  const LinkComponent = (props: LinkProps) => {
-    const collection = props.data as CollectionSetDetails;
+  const LinkComponent = () => {
+    //const collection = props.data as CollectionSetDetails;
 
     return (
       <Button variant="link" onClick={() => {}} style={{ padding: 0 }}>
@@ -100,6 +100,7 @@ export default function CardCollectionDetails() {
         window.URL.revokeObjectURL(blobURL);
         toastNotify("Collection exported");
       })
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .catch((err) => {
         toastNotify("Error exporting cards.", "error");
       })
@@ -151,11 +152,6 @@ export default function CardCollectionDetails() {
       cellRenderer: LinkComponent,
     },
   ];
-
-  interface LinkProps extends ICellRendererParams {
-    value: string;
-    data: CollectionSetDetails;
-  }
 
   if (!loading && error === null && collection !== null) {
     return (
