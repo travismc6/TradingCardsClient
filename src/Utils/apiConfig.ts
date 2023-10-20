@@ -1,6 +1,6 @@
 import axios from "axios";
 
-axios.defaults.baseURL = "https://localhost:44395/api/";
+axios.defaults.baseURL = import.meta.env.VITE_API_URL; //"https://localhost:44395/api/";
 
 export const ENDPOINTS = {
   GET_CHECKLIST: `cardchecklist`,
@@ -26,7 +26,7 @@ axios.interceptors.response.use(async (response: any) => {
   // }
 
   // TODO: undo if in prod
-  await sleep();
+  if (import.meta.env.DEV) await sleep();
 
   return response;
 });
