@@ -1,7 +1,7 @@
-import { useLocation } from "react-router-dom";
+//import { useLocation } from "react-router-dom";
 
 export default function ServerError() {
-  const { state } = useLocation();
+  //const { state } = useLocation();
 
   return (
     <div>error!</div>

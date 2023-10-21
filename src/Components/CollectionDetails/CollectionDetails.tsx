@@ -101,7 +101,7 @@ export default function CardCollectionDetails() {
         toastNotify("Collection exported");
       })
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      .catch((err) => {
+      .catch(() => {
         toastNotify("Error exporting cards.", "error");
       })
       .finally(() => setSaving(false));

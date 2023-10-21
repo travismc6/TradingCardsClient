@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ChangeEvent, useEffect, useState } from "react";
 import axios from "axios";
 import { ChecklistCard } from "../../Models/ChecklistCard";
@@ -63,14 +64,14 @@ function ChecklistContainer() {
       .then((response) => {
         setCards(response.data);
       })
-      .catch((err) => {
+      .catch(() => {
         toastNotify("Error loading cards.", "error");
       })
       .finally(() => setLoading(false));
   }
 
   function generateYears(start: number, end: number) {
-    let years = [];
+    const years = [];
     while (start <= end) {
       years.push(start++);
     }
@@ -158,7 +159,6 @@ function ChecklistContainer() {
       )
       .then((response) => {
         const newCard = { ...card, collectionCardId: response.data };
-        const originalIndex = cards.indexOf(card);
         setCards((prevCards) => {
           const originalIndex = prevCards.indexOf(card);
           return [
@@ -171,7 +171,7 @@ function ChecklistContainer() {
 
         toastNotify("New card added...");
       })
-      .catch((err) => {
+      .catch(() => {
         toastNotify("Error adding new card", "error");
       })
       .finally(() => setSaving(false));
@@ -189,7 +189,7 @@ function ChecklistContainer() {
           },
         }
       )
-      .then((response) => {
+      .then(() => {
         if (cards.filter((c) => card.id === c.id).length > 1) {
           setCards((prevCards) => prevCards.filter((c) => c !== card));
         } else {
@@ -202,7 +202,7 @@ function ChecklistContainer() {
 
         toastNotify("Card deleted...");
       })
-      .catch((err) => {
+      .catch(() => {
         toastNotify("Error deleting card", "error");
       })
       .finally(() => setSaving(false));
@@ -222,7 +222,7 @@ function ChecklistContainer() {
           Authorization: `Bearer ${user?.authToken}`,
         },
       })
-      .then((response) => {
+      .then(() => {
         // set is no loading
         setCardsAdded([]);
         //setCardsRemoved([]);
@@ -230,7 +230,7 @@ function ChecklistContainer() {
 
         toastNotify("Collection Updated!");
       })
-      .catch((err) => {
+      .catch(() => {
         toastNotify("Error saving collection", "error");
         // set banner
       })

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from "axios";
 import React, { useState, FormEvent } from "react";
 import { Form, Button, Container } from "react-bootstrap";
@@ -44,7 +45,7 @@ export default function Register() {
             toastNotify("User created. Please Login to continue...");
           }
         })
-        .catch((err) => {
+        .catch(() => {
           toastNotify("Error registering...", "error");
         });
     } catch (error) {

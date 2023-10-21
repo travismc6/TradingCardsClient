@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useRef, useState } from "react";
 import { Card, Button, Form, DropdownButton, Dropdown } from "react-bootstrap";
 import axios from "axios";
@@ -83,11 +84,11 @@ export default function CardDetails() {
           },
         }
       )
-      .then((response) => {
+      .then(() => {
         toastNotify("Card saved...");
         //handleBack();
       })
-      .catch((err) => {
+      .catch(() => {
         toastNotify("Error saving card", "error");
       })
       .finally(() => setSaving(false));
@@ -109,11 +110,11 @@ export default function CardDetails() {
           },
         }
       )
-      .then((response) => {
+      .then(() => {
         toastNotify("Card deleted...");
         handleBack();
       })
-      .catch((err) => {
+      .catch(() => {
         toastNotify("Error deleting card", "error");
       })
       .finally(() => setSaving(false));
@@ -180,7 +181,7 @@ export default function CardDetails() {
             }));
           }
         })
-        .catch((err) => {
+        .catch(() => {
           toastNotify("Error uploading image", "error");
         })
         .finally(() => setSaving(false));
