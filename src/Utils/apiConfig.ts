@@ -10,6 +10,7 @@ export const ENDPOINTS = {
   LOGIN: `auth/login`,
   SAVE_CARD: `cardcollection`,
   COLLECTION_DETAILS: `cardcollection/details`,
+  UPLOAD_CARD_SET: "admin/cardset",
   DELETE_CARD: (id: string) => `cardcollection/delete/${id}`,
   DUPLICATE_CARD: (id: string) => `cardcollection/duplicate/${id}`,
   IMAGE_UPLOAD: (id: string) => `cardcollection/image/${id}`,

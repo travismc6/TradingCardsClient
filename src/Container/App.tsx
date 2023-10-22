@@ -11,6 +11,7 @@ import Login from "../Components/Authentication/Login";
 import { AuthProvider } from "../Components/Hooks/AuthContext";
 import ServerError from "../Components/Common/ServerError";
 import CardCollectionDetails from "../Components/CollectionDetails/CollectionDetails";
+import Admin from "../Components/Admin/Admin";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="/login" element={<Login />}></Route>
             <Route path="/register" element={<Register />}></Route>
             <Route path="/card/:id" element={<CardDetails />}></Route>
+            <Route path="/admin" element={<Admin />}></Route>
             <Route
               path="/collection"
               element={<CardCollectionDetails />}

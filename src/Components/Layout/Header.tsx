@@ -36,7 +36,7 @@ function Header() {
           )}
           {user && (
             <Nav.Item>
-              <NavLink to="/another-path" className="nav-link">
+              <NavLink to="/admin" className="nav-link">
                 Admin
               </NavLink>
             </Nav.Item>
