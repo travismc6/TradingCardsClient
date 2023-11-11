@@ -20,13 +20,14 @@ import toastNotify from "../Common/toastHelper";
 import { BrandsEnum } from "../../Models/BrandsEnum";
 import qs from "qs";
 import useAuth from "../Hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import InfoModal from "../Common/InfoModal";
 import Loading from "../Common/Loading";
 import Saving from "../Common/Saving";
 
 function ChecklistContainer() {
   const { user, userLoaded } = useAuth();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const [cards, setCards] = useState<Array<ChecklistCard>>([]);
@@ -36,7 +37,12 @@ function ChecklistContainer() {
   const [saving, setSaving] = useState<boolean>(false);
 
   const [cardParams, setCardParams] = useState<CardParams>({
-    inCollection: false,
+    inCollection: undefined,
+    year: searchParams.get("year") !== null ? +searchParams.get("year")! : null,
+    brands:
+      searchParams.get("brand") !== null
+        ? [+searchParams.get("brand")!]
+        : undefined,
   });
 
   const [cardsAdded, setCardsAdded] = useState<number[]>([]);
@@ -127,7 +133,14 @@ function ChecklistContainer() {
   };
 
   const handleOnlyCollectionChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const isChecked = event.target.checked;
+    let isChecked: boolean | undefined = undefined;
+
+    if (event.target.value === "0") {
+      isChecked = false;
+    } else if (event.target.value === "1") {
+      isChecked = true;
+    }
+
     setCardParams((prevState) => ({
       ...prevState,
       inCollection: isChecked,
@@ -268,18 +281,21 @@ function ChecklistContainer() {
                   type="checkbox"
                   label="Topps"
                   id={BrandsEnum.Topps.toString()}
+                  checked={cardParams.brands?.includes(BrandsEnum.Topps)}
                   onChange={handleBrandChange}
                 />
                 <Form.Check
                   type="checkbox"
                   label="Bowman"
                   id={BrandsEnum.Bowman.toString()}
+                  checked={cardParams.brands?.includes(BrandsEnum.Bowman)}
                   onChange={handleBrandChange}
                 />
                 <Form.Check
                   type="checkbox"
                   label="UpperDeck"
                   id={BrandsEnum.UpperDeck.toString()}
+                  checked={cardParams.brands?.includes(BrandsEnum.UpperDeck)}
                   onChange={handleBrandChange}
                 />
               </Form.Group>
@@ -315,12 +331,32 @@ function ChecklistContainer() {
               {user !== null && (
                 <div>
                   <Form style={{ marginTop: "20px" }}>
-                    <Form.Check // prettier-ignore
-                      type="switch"
-                      id="custom-switch"
-                      label="Only cards in collection"
+                    <Form.Group
+                      controlId="exampleForm.SelectCustom"
                       onChange={handleOnlyCollectionChange}
-                    />
+                    >
+                      <Form.Check // prettier-ignore
+                        type="radio"
+                        id={`radio-all`}
+                        label={`All Cards`}
+                        checked={cardParams.inCollection === undefined}
+                        value={undefined}
+                      />
+                      <Form.Check // prettier-ignore
+                        type="radio"
+                        id={`radio-incollection`}
+                        label={`In Collection`}
+                        checked={cardParams.inCollection === true}
+                        value={1}
+                      />
+                      <Form.Check // prettier-ignore
+                        type="radio"
+                        id={`radio-missing`}
+                        label={`NOT in Collection`}
+                        checked={cardParams.inCollection === false}
+                        value={0}
+                      />
+                    </Form.Group>
                   </Form>
 
                   <div style={{ marginTop: "40px" }}>

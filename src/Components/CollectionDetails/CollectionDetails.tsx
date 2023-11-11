@@ -11,9 +11,11 @@ import {
   CollectionSetDetails,
 } from "../../Models/CollectionDetails";
 import { AgGridReact } from "ag-grid-react";
-import { ColDef } from "ag-grid-community";
+import { CellClickedEvent, ColDef } from "ag-grid-community";
 import { FaFileExcel } from "react-icons/fa";
 import toastNotify from "../Common/toastHelper";
+import { useNavigate } from "react-router-dom";
+
 import qs from "qs";
 
 export interface CollectionDetailsProps {
@@ -23,6 +25,7 @@ export interface CollectionDetailsProps {
 export default function CardCollectionDetails() {
   const { user, userLoaded } = useAuth();
 
+  const navigate = useNavigate();
   const [collection, setCollection] = useState<CollectionDetails | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -107,6 +110,15 @@ export default function CardCollectionDetails() {
       .finally(() => setSaving(false));
   }
 
+  function HandleNavigateToChecklist(
+    event: CellClickedEvent<CollectionSetDetails, any>
+  ) {
+    const url =
+      "/?year=" + event.data?.setYear + "&brand=" + event.data?.brandId;
+
+    navigate(url);
+  }
+
   const columnDefs: ColDef[] = [
     {
       headerName: "Year",
@@ -150,6 +162,7 @@ export default function CardCollectionDetails() {
       headerName: "",
       sortable: false,
       cellRenderer: LinkComponent,
+      onCellClicked: HandleNavigateToChecklist,
     },
   ];
 

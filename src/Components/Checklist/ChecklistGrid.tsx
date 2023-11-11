@@ -164,7 +164,7 @@ export default function ChecklistGrid({
       sortable: true,
       cellRenderer: PlayerNameComponent,
     },
-    // { headerName: "Notes", field: "notes", sortable: true },
+    { headerName: "Notes", field: "notes", sortable: true },
     {
       headerName: "",
       sortable: false,

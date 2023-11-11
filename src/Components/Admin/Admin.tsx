@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import useAuth from "../Hooks/useAuth";
 import axios from "axios";
@@ -9,7 +9,7 @@ import toastNotify from "../Common/toastHelper";
 const Admin: React.FC = () => {
   const { user } = useAuth();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [saving, setSaving] = useState<boolean>(false);
+  //const [saving, setSaving] = useState<boolean>(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -19,13 +19,13 @@ const Admin: React.FC = () => {
 
   const handleImport = async () => {
     if (selectedFile) {
-      setSaving(true);
+      //setSaving(true);
 
       const formData = new FormData();
       formData.append("file", selectedFile);
 
       try {
-        setSaving(true);
+        //setSaving(true);
 
         await axios.post(ENDPOINTS.UPLOAD_CARD_SET, formData, {
           headers: {
@@ -43,7 +43,7 @@ const Admin: React.FC = () => {
       toastNotify("Error uploading card set.", "error");
     }
 
-    setSaving(false);
+    //setSaving(false);
   };
 
   return (
