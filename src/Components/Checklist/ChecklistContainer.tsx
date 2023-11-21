@@ -49,7 +49,7 @@ function ChecklistContainer() {
 
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const years = generateYears(1951, 1970);
+  const years = generateYears(1948, 1970);
 
   useEffect(() => {
     if (userLoaded) loadCards();
@@ -296,6 +296,13 @@ function ChecklistContainer() {
                   label="UpperDeck"
                   id={BrandsEnum.UpperDeck.toString()}
                   checked={cardParams.brands?.includes(BrandsEnum.UpperDeck)}
+                  onChange={handleBrandChange}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Leaf"
+                  id={BrandsEnum.Leaf.toString()}
+                  checked={cardParams.brands?.includes(BrandsEnum.Leaf)}
                   onChange={handleBrandChange}
                 />
               </Form.Group>

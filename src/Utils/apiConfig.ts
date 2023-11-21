@@ -5,7 +5,7 @@ axios.defaults.baseURL = import.meta.env.VITE_API_URL; //"https://localhost:4439
 export const ENDPOINTS = {
   GET_CHECKLIST: `cardchecklist`,
   SAVE_CHECKLIST: `cardchecklist`,
-  EXPORT_CHECKLIST: `cardchecklist/export`,
+  EXPORT_CHECKLIST: `cardcollection/export`,
   REGISTER: `auth/register`,
   LOGIN: `auth/login`,
   SAVE_CARD: `cardcollection`,

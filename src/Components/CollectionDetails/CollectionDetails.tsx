@@ -11,7 +11,11 @@ import {
   CollectionSetDetails,
 } from "../../Models/CollectionDetails";
 import { AgGridReact } from "ag-grid-react";
-import { CellClickedEvent, ColDef } from "ag-grid-community";
+import {
+  CellClickedEvent,
+  ColDef,
+  ValueFormatterParams,
+} from "ag-grid-community";
 import { FaFileExcel } from "react-icons/fa";
 import toastNotify from "../Common/toastHelper";
 import { useNavigate } from "react-router-dom";
@@ -119,6 +123,20 @@ export default function CardCollectionDetails() {
     navigate(url);
   }
 
+  const percentFormatter = (params: ValueFormatterParams) => {
+    const percentage = (params.value as number) * 100;
+
+    if (percentage > 0 && percentage < 1) {
+      return "1%";
+    }
+
+    if (percentage > 99 && percentage < 100) {
+      return "99%";
+    }
+
+    return `${percentage.toFixed(0)}%`;
+  };
+
   const columnDefs: ColDef[] = [
     {
       headerName: "Year",
@@ -141,12 +159,9 @@ export default function CardCollectionDetails() {
       headerName: "Completion",
       field: "setCount",
       sortable: true,
+      valueFormatter: percentFormatter,
       valueGetter: (params: any) => {
-        const percentage = Math.round(
-          (params.data.uniqueCollectionCount / params.data.setCount) * 100
-        );
-
-        return `${percentage.toFixed(0)}%`;
+        return params.data.uniqueCollectionCount / params.data.setCount;
       },
     },
     {
