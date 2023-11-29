@@ -12,10 +12,13 @@ import { AuthProvider } from "../Components/Hooks/AuthContext";
 import ServerError from "../Components/Common/ServerError";
 import CardCollectionDetails from "../Components/CollectionDetails/CollectionDetails";
 import Admin from "../Components/Admin/Admin";
+import AxiosInterceptorProvider from "../Components/Hooks/AxiosInterceptor";
+//import useAxiosInterceptor from "../Components/Hooks/AxiosIntercepter";
 
 function App() {
   return (
     <AuthProvider>
+      <AxiosInterceptorProvider />
       <div>
         <Header />
         <div className="pb-5">

@@ -1,4 +1,5 @@
 import axios from "axios";
+//import { useNavigate } from "react-router-dom";
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL; //"https://localhost:44395/api/";
 
@@ -6,6 +7,7 @@ export const ENDPOINTS = {
   GET_CHECKLIST: `cardchecklist`,
   SAVE_CHECKLIST: `cardchecklist`,
   EXPORT_CHECKLIST: `cardcollection/export`,
+  IMPORT_CHECKLIST: `cardcollection/import`,
   REGISTER: `auth/register`,
   LOGIN: `auth/login`,
   SAVE_CARD: `cardcollection`,
@@ -16,21 +18,6 @@ export const ENDPOINTS = {
   IMAGE_UPLOAD: (id: string) => `cardcollection/image/${id}`,
   CARD_DETAILS: (id: string) => `cardcollection/${id}`,
 };
-
-const sleep = () => new Promise((resolve) => setTimeout(resolve, 500));
-
-axios.interceptors.response.use(async (response: any) => {
-  // if (process.env.NODE_ENV === "development") {
-  //   alert("in dev");
-  //   const API_BASE_URL = "https://localhost:44395/api";
-
-  // }
-
-  // TODO: undo if in prod
-  if (import.meta.env.DEV) await sleep();
-
-  return response;
-});
 
 // import axios, { AxiosError, AxiosResponse } from "axios";
 // import useAuth from "../Components/Hooks/useAuth";

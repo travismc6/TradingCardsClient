@@ -180,7 +180,6 @@ function ChecklistContainer() {
             ...prevCards.slice(originalIndex + 1),
           ];
         });
-        setCards((prevCards) => [...prevCards, newCard]);
 
         toastNotify("New card added...");
       })

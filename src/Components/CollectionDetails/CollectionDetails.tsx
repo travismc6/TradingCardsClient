@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Button, Container } from "react-bootstrap";
+import { useEffect, useRef, useState } from "react";
+import { Button, Container, Modal } from "react-bootstrap";
 import axios from "axios";
 import { ENDPOINTS } from "../../Utils/apiConfig";
 import useAuth from "../Hooks/useAuth";
@@ -26,6 +26,11 @@ export interface CollectionDetailsProps {
   details: CollectionSetDetails;
 }
 
+interface ImportResults {
+  imported: number;
+  failed: number;
+}
+
 export default function CardCollectionDetails() {
   const { user, userLoaded } = useAuth();
 
@@ -35,6 +40,11 @@ export default function CardCollectionDetails() {
   const [loading, setLoading] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showModal, setShowModal] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     // Load data using axios
@@ -114,6 +124,59 @@ export default function CardCollectionDetails() {
       .finally(() => setSaving(false));
   }
 
+  const handleImportFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = event.target.files;
+    if (files && files[0]) {
+      setSelectedFile(files[0]);
+      setShowModal(true);
+    }
+  };
+
+  const handleModalConfirm = async () => {
+    setShowModal(false);
+
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      try {
+        setSaving(true);
+
+        const result = await axios.post<ImportResults>(
+          ENDPOINTS.IMPORT_CHECKLIST,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${user?.authToken}`,
+            },
+            paramsSerializer: (params) =>
+              qs.stringify(params, { arrayFormat: "repeat" }),
+          }
+        );
+        toastNotify(`Successfully Imported ${result.data.imported} Cards`);
+
+        if (result.data.failed > 0) {
+          toastNotify(`Failed to Import ${result.data.failed} Cards`, "error");
+        }
+      } catch (error) {
+        toastNotify("Error importing collection.", "error");
+      }
+      setSaving(false);
+      loadDetails();
+    } else {
+      toastNotify("Error importing collection.", "error");
+    }
+  };
+
+  const handleModalCancel = () => {
+    // Logic to cancel file upload
+    setSelectedFile(null);
+    setShowModal(false);
+  };
+
   function HandleNavigateToChecklist(
     event: CellClickedEvent<CollectionSetDetails, any>
   ) {
@@ -135,6 +198,10 @@ export default function CardCollectionDetails() {
     }
 
     return `${percentage.toFixed(0)}%`;
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
   };
 
   const columnDefs: ColDef[] = [
@@ -188,9 +255,29 @@ export default function CardCollectionDetails() {
         <Container style={{ padding: 10 }}>
           <h3>Total Cards: {collection.totalCards}</h3>
 
-          <Button variant="success" onClick={handleExportCollection}>
-            <FaFileExcel /> Export
-          </Button>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Button variant="success" onClick={handleExportCollection}>
+              <FaFileExcel /> Export
+            </Button>
+
+            <div style={{ marginLeft: "20px" }}>
+              <input
+                type="file"
+                accept=".xlsx, .xls"
+                onChange={handleImportFileChange}
+                ref={fileInputRef}
+                style={{ display: "none" }} // Hide the input field
+              />
+              <Button onClick={handleImportClick} variant="primary">
+                <FaFileExcel /> Import
+              </Button>
+              {/* {selectedFile && (
+              <Button onClick={() => {}} variant="success">
+                Upload File
+              </Button>
+            )} */}
+            </div>
+          </div>
 
           <div
             className="ag-theme-alpine"
@@ -202,6 +289,23 @@ export default function CardCollectionDetails() {
             />
           </div>
         </Container>
+
+        <Modal show={showModal} onHide={handleModalCancel}>
+          <Modal.Header closeButton>
+            <Modal.Title>WARNING</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            This will replace your entire collection. Do you wish to continue?
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleModalCancel}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleModalConfirm}>
+              Import Collection
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </>
     );
   } else if (error === null) {

@@ -1,5 +1,6 @@
 import React, { createContext, ReactNode, useEffect, useState } from "react";
 import { User } from "../../Models/User";
+//import useAxiosInterceptor from "./AxiosIntercepter";
 
 interface AuthContextType {
   user: User | null;
@@ -29,6 +30,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   };
   const logout = () => {
     setUser(null);
+    setUserLoaded(true);
     localStorage.removeItem("user");
   };
 
